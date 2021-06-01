@@ -99,6 +99,7 @@ class SparseDispatcher(object):
         if multiply_by_gates:
             stitched = stitched.mul(self._nonzero_gates)
         zeros = torch.zeros(self._gates.size(0), expert_out[-1].size(1), requires_grad=True)
+        zeros = zeros.cuda()
         # combine samples that have been processed by the same k experts
         combined = zeros.index_add(0, self._batch_index, stitched.float())
         # add eps to all zero values in order to avoid nans when going back to log space
@@ -315,4 +316,5 @@ class MoE(nn.Module):
         gates = dispatcher.expert_to_gates()
         expert_outputs = [self.experts[i](expert_inputs[i]) for i in range(self.num_experts)]
         y = dispatcher.combine(expert_outputs)
-        return y, loss, gates_return
+        #return y, loss, gates_return
+        return y
